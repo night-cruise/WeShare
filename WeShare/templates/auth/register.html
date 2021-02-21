@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="card mb-3 w-100 bg-light">
+            <div class="card-header"><h4>Welcome to WeShare!</h4></div>
+            <div class="card-body">
+                {{ render_form(form) }}
+                <hr>
+                <small>Already have an account? <a href="{{ url_for('.login') }}">Click here to log in.</a>
+                </small>
+            </div>
+        </div>
+    </div>
+{% endblock %}
