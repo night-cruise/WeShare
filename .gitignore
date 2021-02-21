@@ -127,3 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# db
+*.db
+
+# pycharm settings
+.idea
+
+# image and avatars
+uploads/*
+!uploads/.gitkeep
+!uploads/avatars
+uploads/avatars/*
+!uploads/avatars/.gitkeep
+
+# whooshee
+whooshee
