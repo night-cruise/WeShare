@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+faker = "*"
+watchdog = "*"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-login = "*"
+flask-mail = "*"
+flask-moment = "*"
+flask-wtf = "*"
+flask-ckeditor = "*"
+python-dotenv = "*"
+pillow = "*"
+bootstrap-flask = "*"
+flask-whooshee = "*"
+flask-avatars = "*"
+flask-debugtoolbar = "*"
+email-validator = "*"
+
+[requires]
+python_version = "3.7"
