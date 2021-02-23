@@ -13,7 +13,7 @@ try:
 except ImportError:
     from urllib.parse import urlparse, urljoin
 
-from flask import request, redirect, url_for, current_app
+from flask import request, redirect, url_for, current_app, flash
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -73,3 +73,11 @@ def validate_token(user, token, operation, new_password=None):
         return False
     db.session.commit()
     return True
+
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the %s field - %s" % (
+                getattr(form, field).label.text,
+                error
+            ))
