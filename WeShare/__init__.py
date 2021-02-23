@@ -75,7 +75,7 @@ def register_template_context(app):
         if current_user.is_authenticated:
             notification_count = Notification.query.with_parent(current_user).filter_by(is_read=False).count()
         else:
-            notification_count = Notification
+            notification_count = 0
         return dict(notification_count=notification_count)
 
 def register_errorhandlers(app):
