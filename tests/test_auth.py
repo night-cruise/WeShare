@@ -45,13 +45,20 @@ class AuthTestCase(BaseTestCase):
         self.assertIn('Logout success.', data)
 
     def test_login_protect(self):
-        pass
+        response = self.client.get(url_for('main.new_share'), follow_redirects=True)
+        data = response.get_data(as_text=True)
+        self.assertIn('Please log in to access this page.', data)
 
     def test_unconfirmed_user_permission(self):
-        pass
+        self.login(email='unconfirmed@weshare.com', password='123')
+        response = self.client.get(url_for('main.new_share'), follow_redirects=True)
+        data = response.get_data(as_text=True)
+        self.assertIn('Please confirm your account first.', data)
 
     def test_locked_user_permission(self):
-        pass
+        self.login('locked@weshare.com', password='123')
+        response = self.client.get(url_for('main.new_share'), follow_redirects=True)
+        self.assertEqual(response.status_code, 403)
 
     def test_register_account(self):
         response = self.client.post(url_for('auth.register'), data=dict(
