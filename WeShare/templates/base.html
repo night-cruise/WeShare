@@ -48,6 +48,9 @@
                               class="{% if notification_count == 0 %}hide{% endif %} badge badge-danger badge-notification"
                               data-href="{{ url_for('ajax.notifications_count') }}">{{ notification_count }}</span>
                     </a>
+                    <a class="nav-item nav-link" href="{{ url_for('main.new_share') }}" title="Share">
+                        <span class="oi oi-plus"></span>&nbsp;&nbsp;
+                    </a>
                     <div class="dropdown nav-item">
                         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
                            aria-expanded="false">
