@@ -67,7 +67,7 @@ def collect(share_id):
 @ajax_bp.route('/followers-count/<int:user_id>')
 def followers_count(user_id):
     user = User.query.get_or_404(user_id)
-    count = user.followers.count() - 2
+    count = user.followers.count() - 1
     return jsonify(count=count)
 
 @ajax_bp.route('/unfollow/<username>', methods=['POST'])
