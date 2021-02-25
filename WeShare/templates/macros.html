@@ -17,10 +17,10 @@
             </span>
         </div>
         <div class="card-body">
-            <h4 class="text-primary"><a href="{{ url_for('.show_share', share_id=share.id) }}">{{ share.title }}</a></h4>
+            <h4 class="text-primary"><a href="{{ url_for('main.show_share', share_id=share.id) }}">{{ share.title }}</a></h4>
             <p>
                 {{ share.body|striptags|truncate }}...
-                <small><a href="{{ url_for('.show_share', share_id=share.id) }}">Read More</a></small>
+                <small><a href="{{ url_for('main.show_share', share_id=share.id) }}">Read More</a></small>
             </p>
             <span class="oi oi-star"></span>
             <span id="collectors-count-{{ share.id }}"
