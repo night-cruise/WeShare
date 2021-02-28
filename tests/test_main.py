@@ -106,6 +106,36 @@ class MainTestCase(BaseTestCase):
         self.assertTrue(Notification.query.get(1).is_read)
         self.assertTrue(Notification.query.get(2).is_read)
 
+    def test_new_share(self):
+        self.login()
+        response = self.client.post(url_for('main.new_share'), data=dict(
+            title = 'test title',
+            tag = 'tag1 tag2 tag2',
+            body = 'test body'
+        ), follow_redirects=True)
+        data = response.get_data(as_text=True)
+        self.assertIn('Share success.', data)
+        self.assertIn('test title', data)
+        self.assertIn('tag1', data)
+        self.assertIn('tag2', data)
+
+    def test_edit_share(self):
+        self.login()
+        response = self.client.get(url_for('main.edit_share', share_id=2))
+        data = response.get_data(as_text=True)
+        self.assertIn('test title 2', data)
+        self.assertIn('test body 2', data)
+
+        response = self.client.post(
+            url_for('main.edit_share', share_id=2),
+            data=dict(title='test edit title', body='test edit body'),
+            follow_redirects=True
+        )
+        data = response.get_data(as_text=True)
+        self.assertIn('Edit success.', data)
+        self.assertIn('test edit title', data)
+        self.assertIn('test edit body', data)
+
     def test_show_share(self):
         response = self.client.get(url_for('main.show_share', share_id=1), follow_redirects=True)
         data = response.get_data(as_text=True)
