@@ -13,7 +13,7 @@ from typing import Optional
 
 from flask import url_for
 
-from WeShare.models import Role, User
+from WeShare.models import Role, User, Share, Tag, Comment
 from WeShare import create_app
 from WeShare.extensions import db
 
@@ -44,6 +44,12 @@ class BaseTestCase(unittest.TestCase):
                             confirmed=True, active=False)
         blocked_user.set_password('123')
 
+        share = Share(title='test title 1', body='test body 1', author=admin_user)
+        share2 = Share(title='test title 2', body='test body 2', author=normal_user)
+
+        comment = Comment(body='test comment body', share=share, author=normal_user)
+        tag = Tag(name='test tag')
+        share.tags.append(tag)
 
         db.session.add_all([admin_user, normal_user, unconfirmed_user, locked_user, blocked_user])
         db.session.commit()
