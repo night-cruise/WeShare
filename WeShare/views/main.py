@@ -146,22 +146,22 @@ def show_share(share_id):
 @main_bp.route('/share/n/<int:share_id>')
 def share_next(share_id):
     share = Share.query.get_or_404(share_id)
-    share_p = Share.query.with_parent(share.author).filter(Share.id > share_id).order_by(Share.id.asc()).first()
-
-    if share_p is None:
-        flash('This is already the first one.', 'info')
-        return redirect(url_for('.show_share', share_id=share.id))
-    return redirect(url_for('.show_share', share_id=share_p.id))
-
-@main_bp.route('/share/p/<int:share_id>')
-def share_previous(share_id):
-    share = Share.query.get_or_404(share_id)
     share_n = Share.query.with_parent(share.author).filter(Share.id < share_id).order_by(Share.id.desc()).first()
 
     if share_n is None:
         flash('This is already the last one.', 'info')
         return redirect(url_for('.show_share', share_id=share.id))
     return redirect(url_for('.show_share', share_id=share_n.id))
+
+@main_bp.route('/share/p/<int:share_id>')
+def share_previous(share_id):
+    share = Share.query.get_or_404(share_id)
+    share_p = Share.query.with_parent(share.author).filter(Share.id > share_id).order_by(Share.id.asc()).first()
+
+    if share_p is None:
+        flash('This is already the first one.', 'info')
+        return redirect(url_for('.show_share', share_id=share.id))
+    return redirect(url_for('.show_share', share_id=share_p.id))
 
 @main_bp.route('/edit/share/<int:share_id>', methods=['GET', 'POST'])
 @login_required
@@ -206,7 +206,7 @@ def delete_share(share_id):
 def collect(share_id):
     share = Share.query.get_or_404(share_id)
     if current_user.is_collecting(share):
-        flash('Alread collected.', 'info')
+        flash('Already collected.', 'info')
         return redirect(url_for('.show_share', share_id=share_id))
     current_user.collect(share)
     flash('Share collected.', 'success')
@@ -239,7 +239,7 @@ def show_collectors(share_id):
 @login_required
 def report_share(share_id):
     share = Share.query.get_or_404(share_id)
-    share.flag += 2
+    share.flag += 1
     db.session.commit()
     flash('Share reported.', 'success')
     return redirect(url_for('.show_share', share_id=share_id))
