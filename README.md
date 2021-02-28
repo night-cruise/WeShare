@@ -10,7 +10,7 @@ git clone https://github.com/night-cruise/WeShare.git
 cd WeShare
 ```
 
-Use the pipenv create & activate virtual env then install dependency:
+Use the pipenv create & activate virtual env and then install dependency:
 ```text
 pipenv install --dev
 pipenv shell
