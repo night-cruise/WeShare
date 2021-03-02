@@ -22,6 +22,11 @@ flask-whooshee = "*"
 flask-avatars = "*"
 flask-debugtoolbar = "*"
 email-validator = "*"
+flask-caching = "*"
+flask-assets = "*"
+redis = "*"
+jsmin = "*"
+cssmin = "*"
 
 [requires]
 python_version = "3.7"
