@@ -30,7 +30,7 @@ flask run
 test admin account:
 - email: admin@weshare.com
 - password: weshare
-```
+
 
 ## License
 

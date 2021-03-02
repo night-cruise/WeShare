@@ -141,6 +141,7 @@ uploads/*
 !uploads/avatars
 uploads/avatars/*
 !uploads/avatars/.gitkeep
+img.png
 
 # whooshee
 whooshee

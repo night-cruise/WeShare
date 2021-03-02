@@ -10,9 +10,10 @@
 # here put the import lib
 import os
 import click
-from flask import Flask, render_template
+from flask import Flask, render_template, current_app
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
+from flask_sqlalchemy import get_debug_queries
 
 from WeShare.views.admin import admin_bp
 from WeShare.views.user import user_bp
@@ -38,8 +39,22 @@ def create_app(config_name=None):
     register_template_context(app)
     register_errorhandlers(app)
     register_commands(app)
+    register_request_handlers(app)
 
     return app
+
+def register_request_handlers(app):
+    @app.after_request
+    def query_profiler(response):
+        for q in get_debug_queries():
+            if q.duration >= current_app.config['WESHARE_SLOW_QUERY_THRESHOLD']:
+                current_app.logger.warning(
+                    'Slow query: Duration: %f\n Context: %s\nQuery: %s\b'%(
+                        q.duration, q.context, q.statement
+                    )
+                )
+
+        return response
 
 def register_extensions(app):
     bootstrap.init_app(app)
