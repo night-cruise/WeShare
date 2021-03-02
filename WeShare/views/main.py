@@ -14,7 +14,7 @@ from flask_login import login_required, current_user
 from flask_ckeditor import upload_fail, upload_success, random_filename
 
 from WeShare.helpers import allowed_file, redirect_back, flash_errors
-from WeShare.extensions import db
+from WeShare.extensions import db, cache
 from WeShare.models import Share, Follow, Tag, User, Notification, Comment, Collect
 from WeShare.forms.main import CommentForm, TagForm, ShareForm, EditShareForm
 from WeShare.decorators import confirm_required, permission_required
@@ -49,6 +49,7 @@ def explore():
     return render_template('main/explore.html', shares=shares)
 
 @main_bp.route('/search')
+@cache.cached(timeout=60*60, query_string=True)
 def search():
     q = request.args.get('q', '').strip()
     if q == '':
@@ -227,6 +228,7 @@ def uncollect(share_id):
     return redirect(url_for('.show_share', share_id=share_id))
 
 @main_bp.route('/share/<int:share_id>/collectors')
+@cache.cached(timeout=60*60, query_string=True)
 def show_collectors(share_id):
     share = Share.query.get_or_404(share_id)
     page = request.args.get('page', 1, type=int)
@@ -341,6 +343,7 @@ def new_tag(share_id):
 
 @main_bp.route('/tag/<int:tag_id>', defaults={'order': 'by_time'})
 @main_bp.route('/tag/<int:tag_id>/<order>')
+@cache.cached(timeout=60*60, query_string=True)
 def show_tag(tag_id, order):
     tag = Tag.query.get_or_404(tag_id)
     page = request.args.get('page', 1, type=int)

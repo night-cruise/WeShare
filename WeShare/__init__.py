@@ -21,7 +21,7 @@ from WeShare.views.main import main_bp
 from WeShare.views.auth import auth_bp
 from WeShare.views.ajax import ajax_bp
 from WeShare.extensions import bootstrap, db, login_manager, \
-    mail, moment, whooshee, avatars, csrf, debugtoolbar, ckeditor
+    mail, moment, whooshee, avatars, csrf, debugtoolbar, ckeditor, cache, assets
 from WeShare.models import Role, User, Share, Tag, Follow, \
     Notification, Comment, Collect, Permission
 from WeShare.settings import config
@@ -31,6 +31,8 @@ def create_app(config_name=None):
         config_name = os.getenv('FLASK_CONFIG', 'development')
 
     app = Flask(__name__)
+    app.jinja_env.trim_blocks = True
+    app.jinja_env.lstrip_blocks = True
     app.config.from_object(config[config_name])
 
     register_extensions(app)
@@ -67,6 +69,8 @@ def register_extensions(app):
     csrf.init_app(app)
     debugtoolbar.init_app(app)
     ckeditor.init_app(app)
+    cache.init_app(app)
+    assets.init_app(app)
 
 def register_blueprints(app):
     app.register_blueprint(main_bp)

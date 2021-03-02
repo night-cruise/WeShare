@@ -15,7 +15,7 @@ from WeShare.decorators import permission_required, admin_required
 from WeShare.forms.admin import EditProfileAdminForm
 from WeShare.helpers import redirect_back
 from WeShare.models import User, Share, Tag, Comment, Role
-from WeShare.extensions import db
+from WeShare.extensions import db, cache
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -23,6 +23,7 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route('/index')
 @login_required
 @permission_required('MODERATE')
+@cache.cached(timeout=60*60, query_string=True)
 def index():
     user_count = User.query.count()
     locked_user_count = User.query.filter_by(locked=True).count()
