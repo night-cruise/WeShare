@@ -32,70 +32,70 @@
         <div id="tags">
             <p>
                 {% if share.tags %}
-                    {% for tag in share.tags %}
-                        <a class="badge badge-light"
-                           href="{{ url_for('.show_tag', tag_id=tag.id) }}" target="_blank"><span
-                                class="oi oi-tag"></span> {{ tag.name }}</a>
-                    {% endfor %}
+                {% for tag in share.tags %}
+                <a class="badge badge-light"
+                   href="{{ url_for('.show_tag', tag_id=tag.id) }}" target="_blank"><span
+                        class="oi oi-tag"></span> {{ tag.name }}</a>
+                {% endfor %}
                 {% endif %}
                 {% if current_user == share.author %}
-                    <a id="tag-btn" href="#!">
-                        <small><span class="oi oi-pencil"></span> edit tag</small>
-                    </a>
+                <a id="tag-btn" href="#!">
+                    <small><span class="oi oi-pencil"></span> edit tag</small>
+                </a>
                 {% endif %}
             </p>
         </div>
         {% if current_user == share.author %}
-            <div id="tag-form">
-                <form action="{{ url_for('.new_tag', share_id=share.id) }}" method="post">
-                    {{ tag_form.csrf_token }}
-                    {{ render_field(tag_form.tag) }}
-                    <a class="btn btn-light btn-sm" id="cancel-tag">Cancel</a>
-                    {{ render_field(tag_form.submit, class='btn btn-success btn-sm') }}
-                </form>
-                {% if share.tags %}
-                    <hr>
-                    {% for tag in share.tags %}
-                        <a class="dead-link" href="#!"
-                           data-href="{{ url_for('.delete_tag', share_id=share.id, tag_id=tag.id) }}"
-                           data-toggle="modal" data-target="#confirm-delete" title="Delete tag">
+        <div id="tag-form">
+            <form action="{{ url_for('.new_tag', share_id=share.id) }}" method="post">
+                {{ tag_form.csrf_token }}
+                {{ render_field(tag_form.tag) }}
+                <a class="btn btn-light btn-sm" id="cancel-tag">Cancel</a>
+                {{ render_field(tag_form.submit, class='btn btn-success btn-sm') }}
+            </form>
+            {% if share.tags %}
+            <hr>
+            {% for tag in share.tags %}
+            <a class="dead-link" href="#!"
+               data-href="{{ url_for('.delete_tag', share_id=share.id, tag_id=tag.id) }}"
+               data-toggle="modal" data-target="#confirm-delete" title="Delete tag">
                 <span class="badge badge-danger">
                 {{ tag.name }} <span class="oi oi-trash" aria-hidden="true"></span>
             </span>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-            </div>
+            </a>
+            {% endfor %}
+            {% endif %}
+        </div>
         {% endif %}
         {% if current_user.is_authenticated %}
-            {% if current_user.is_collecting(share) %}
-                <form class="inline" method="post"
-                      action="{{ url_for('main.uncollect', share_id=share.id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <span class="oi oi-x"></span> Uncollect
-                    </button>
-                </form>
-            {% else %}
-                <form class="inline" method="post"
-                      action="{{ url_for('main.collect', share_id=share.id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                        <span class="oi oi-star"></span> Collect
-                    </button>
-                </form>
-            {% endif %}
+        {% if current_user.is_collecting(share) %}
+        <form class="inline" method="post"
+              action="{{ url_for('main.uncollect', share_id=share.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <span class="oi oi-x"></span> Uncollect
+            </button>
+        </form>
         {% else %}
-            <form class="inline" method="post" action="{{ url_for('main.collect', share_id=share.id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <span class="oi oi-star"></span> Collect
-                </button>
-            </form>
+        <form class="inline" method="post"
+              action="{{ url_for('main.collect', share_id=share.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <span class="oi oi-star"></span> Collect
+            </button>
+        </form>
+        {% endif %}
+        {% else %}
+        <form class="inline" method="post" action="{{ url_for('main.collect', share_id=share.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <span class="oi oi-star"></span> Collect
+            </button>
+        </form>
         {% endif %}
         {% if share.collectors %}
-            <a href="{{ url_for('main.show_collectors', share_id=share.id) }}">{{ share.collectors|length }}
-                collectors</a>
+        <a href="{{ url_for('main.show_collectors', share_id=share.id) }}">{{ share.collectors|length }}
+            collectors</a>
         {% endif %}
     </div>
 </div>

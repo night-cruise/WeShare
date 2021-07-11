@@ -9,18 +9,18 @@
 """
 # here put the import lib
 import os
+
 from flask import Blueprint, request, current_app, url_for, send_from_directory, render_template, flash, abort, redirect
-from flask_login import login_required, current_user
 from flask_ckeditor import upload_fail, upload_success, random_filename
-
-from WeShare.helpers import allowed_file, redirect_back, flash_errors
-from WeShare.extensions import db, cache
-from WeShare.models import Share, Follow, Tag, User, Notification, Comment, Collect
-from WeShare.forms.main import CommentForm, TagForm, ShareForm, EditShareForm
-from WeShare.decorators import confirm_required, permission_required
-from WeShare.notifications import push_collect_notification, push_comment_notification
-
+from flask_login import login_required, current_user
 from sqlalchemy.sql.expression import func
+
+from WeShare.decorators import confirm_required, permission_required
+from WeShare.extensions import db, cache
+from WeShare.forms.main import CommentForm, TagForm, ShareForm, EditShareForm
+from WeShare.helpers import allowed_file, redirect_back, flash_errors
+from WeShare.models import Share, Follow, Tag, User, Notification, Comment, Collect
+from WeShare.notifications import push_collect_notification, push_comment_notification
 
 main_bp = Blueprint('main', __name__)
 
@@ -32,8 +32,8 @@ def index():
         page = request.args.get('page', 1, type=int)
         per_page = current_app.config['WESHARE_SHARE_PER_PAGE']
         pagination = Share.query \
-            .join(Follow, Follow.followed_id==Share.author_id) \
-            .filter(Follow.follower_id==current_user.id) \
+            .join(Follow, Follow.followed_id == Share.author_id) \
+            .filter(Follow.follower_id == current_user.id) \
             .order_by(Share.timestamp.desc()) \
             .paginate(page, per_page)
         shares = pagination.items
@@ -43,13 +43,15 @@ def index():
     tags = Tag.query.join(Tag.shares).group_by(Tag.id).order_by(func.count(Share.id).desc()).limit(10)
     return render_template('main/index.html', shares=shares, pagination=pagination, tags=tags)
 
+
 @main_bp.route('/explore')
 def explore():
     shares = Share.query.order_by(func.random()).limit(12)
     return render_template('main/explore.html', shares=shares)
 
+
 @main_bp.route('/search')
-@cache.cached(timeout=60*60, query_string=True)
+@cache.cached(timeout=60 * 60, query_string=True)
 def search():
     q = request.args.get('q', '').strip()
     if q == '':
@@ -82,6 +84,7 @@ def show_notifications():
     notifications = pagination.items
     return render_template('main/notifications.html', pagination=pagination, notifications=notifications)
 
+
 @main_bp.route('/notifications/read/all', methods=['POST'])
 @login_required
 def read_all_notification():
@@ -90,6 +93,7 @@ def read_all_notification():
     db.session.commit()
     flash('All notifications archived.', 'success')
     return redirect(url_for('.show_notifications'))
+
 
 @main_bp.route('/notification/read/<int:notification_id>', methods=['POST'])
 @login_required
@@ -103,6 +107,7 @@ def read_notification(notification_id):
     flash('Notification archived.', 'success')
     return redirect(url_for('.show_notifications'))
 
+
 @main_bp.route('/new/share', methods=['GET', 'POST'])
 @login_required
 @confirm_required
@@ -113,9 +118,9 @@ def new_share():
         title = form.title.data
         body = form.body.data
         share = Share(
-            title = title,
-            body = body,
-            author = current_user._get_current_object()
+            title=title,
+            body=body,
+            author=current_user._get_current_object()
         )
         for name in form.tag.data.split():
             tag = Tag.query.filter_by(name=name).first()
@@ -129,6 +134,7 @@ def new_share():
         flash('Share success.', 'info')
         return redirect(url_for('main.show_share', share_id=share.id))
     return render_template('main/new_share.html', form=form)
+
 
 @main_bp.route('/share/<int:share_id>')
 def show_share(share_id):
@@ -144,6 +150,7 @@ def show_share(share_id):
                            pagination=pagination, comments=comments
                            )
 
+
 @main_bp.route('/share/n/<int:share_id>')
 def share_next(share_id):
     share = Share.query.get_or_404(share_id)
@@ -154,6 +161,7 @@ def share_next(share_id):
         return redirect(url_for('.show_share', share_id=share.id))
     return redirect(url_for('.show_share', share_id=share_n.id))
 
+
 @main_bp.route('/share/p/<int:share_id>')
 def share_previous(share_id):
     share = Share.query.get_or_404(share_id)
@@ -163,6 +171,7 @@ def share_previous(share_id):
         flash('This is already the first one.', 'info')
         return redirect(url_for('.show_share', share_id=share.id))
     return redirect(url_for('.show_share', share_id=share_p.id))
+
 
 @main_bp.route('/edit/share/<int:share_id>', methods=['GET', 'POST'])
 @login_required
@@ -181,6 +190,7 @@ def edit_share(share_id):
     form.body.data = share.body
     return render_template('main/edit_share.html', form=form)
 
+
 @main_bp.route('/delete/share/<int:share_id>', methods=['POST'])
 @login_required
 def delete_share(share_id):
@@ -194,11 +204,13 @@ def delete_share(share_id):
 
     share_n = Share.query.with_parent(share.author).filter(Share.id < share_id).order_by(Share.timestamp.desc()).first()
     if share_n is None:
-        share_p = Share.query.with_parent(share.author).filter(Share.id > share_id).order_by(Share.timestamp.asc()).first()
+        share_p = Share.query.with_parent(share.author).filter(Share.id > share_id).order_by(
+            Share.timestamp.asc()).first()
         if share_p is None:
             return redirect(url_for('user.index', username=share.author.username))
         return redirect(url_for('.show_share', share_id=share_p.id))
     return redirect(url_for('.show_share', share_id=share_n.id))
+
 
 @main_bp.route('/collect/<int:share_id>', methods=['POST'])
 @login_required
@@ -211,9 +223,10 @@ def collect(share_id):
         return redirect(url_for('.show_share', share_id=share_id))
     current_user.collect(share)
     flash('Share collected.', 'success')
-    if current_user !=  share.author and share.author.receive_collect_notification:
+    if current_user != share.author and share.author.receive_collect_notification:
         push_collect_notification(current_user, share_id, share.author)
     return redirect(url_for('.show_share', share_id=share_id))
+
 
 @main_bp.route('/uncollect/<int:share_id>', methods=['POST'])
 @login_required
@@ -227,8 +240,9 @@ def uncollect(share_id):
     flash('Share uncollected.', 'info')
     return redirect(url_for('.show_share', share_id=share_id))
 
+
 @main_bp.route('/share/<int:share_id>/collectors')
-@cache.cached(timeout=60*60, query_string=True)
+@cache.cached(timeout=60 * 60, query_string=True)
 def show_collectors(share_id):
     share = Share.query.get_or_404(share_id)
     page = request.args.get('page', 1, type=int)
@@ -236,6 +250,7 @@ def show_collectors(share_id):
     pagination = Collect.query.with_parent(share).order_by(Collect.timestamp.desc()).paginate(page, per_page)
     collects = pagination.items
     return render_template('main/collectors.html', collects=collects, pagination=pagination, share=share)
+
 
 @main_bp.route('/report/share/<int:share_id>', methods=['POST'])
 @login_required
@@ -245,6 +260,7 @@ def report_share(share_id):
     db.session.commit()
     flash('Share reported.', 'success')
     return redirect(url_for('.show_share', share_id=share_id))
+
 
 @main_bp.route('/share/<int:share_id>/new/comment', methods=['GET', 'POST'])
 @login_required
@@ -274,6 +290,7 @@ def new_comment(share_id):
         flash_errors(form)
         return redirect(url_for('.show_share', share_id=share_id, page=page))
 
+
 @main_bp.route('/set-comment/<int:share_id>', methods=['POST'])
 @login_required
 def set_comment(share_id):
@@ -289,6 +306,7 @@ def set_comment(share_id):
     db.session.commit()
     return redirect(url_for('.show_share', share_id=share_id))
 
+
 @main_bp.route('/reply/comment/<int:comment_id>')
 @login_required
 def reply_comment(comment_id):
@@ -299,6 +317,7 @@ def reply_comment(comment_id):
             reply=comment_id, author=comment.author.name
         ) + '#comment-form'
     )
+
 
 @main_bp.route('/delete/comment/<int:comment_id>', methods=['POST'])
 @login_required
@@ -312,6 +331,7 @@ def delete_comment(comment_id):
     flash('Comment deleted.', 'info')
     return redirect(url_for('.show_share', share_id=comment.share_id))
 
+
 @main_bp.route('/report/comment/<int:comment_id>', methods=['POST'])
 @login_required
 def report_comment(comment_id):
@@ -320,6 +340,7 @@ def report_comment(comment_id):
     db.session.commit()
     flash('Comment reported.', 'success')
     return redirect(url_for('.show_share', share_id=comment.share_id))
+
 
 @main_bp.route('/share/<int:share_id>/new/tag', methods=['POST'])
 def new_tag(share_id):
@@ -341,9 +362,10 @@ def new_tag(share_id):
     flash_errors(form)
     return redirect(url_for('.show_share', share_id=share_id))
 
+
 @main_bp.route('/tag/<int:tag_id>', defaults={'order': 'by_time'})
 @main_bp.route('/tag/<int:tag_id>/<order>')
-@cache.cached(timeout=60*60, query_string=True)
+@cache.cached(timeout=60 * 60, query_string=True)
 def show_tag(tag_id, order):
     tag = Tag.query.get_or_404(tag_id)
     page = request.args.get('page', 1, type=int)
@@ -374,13 +396,16 @@ def delete_tag(share_id, tag_id):
     flash('Tag deleted.', 'info')
     return redirect(url_for('.show_share', share_id=share_id))
 
+
 @main_bp.route('/avatars/<path:filename>')
 def get_avatar(filename):
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename)
 
+
 @main_bp.route('/uploads/<path:filename>')
 def get_image(filename):
     return send_from_directory(current_app.config['WESHARE_UPLOAD_PATH'], filename)
+
 
 @main_bp.route('/upload', methods=['POST'])
 def upload_image():

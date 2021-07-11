@@ -16,6 +16,7 @@ from WeShare.notifications import push_collect_notification, push_follow_notific
 
 ajax_bp = Blueprint('ajax', __name__)
 
+
 @ajax_bp.route('/notifications-count')
 def notifications_count():
     if not current_user.is_authenticated:
@@ -23,16 +24,19 @@ def notifications_count():
     count = Notification.query.with_parent(current_user).filter_by(is_read=False).count()
     return jsonify(count=count)
 
+
 @ajax_bp.route('/get-profile/<int:user_id>')
 def get_profile(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('main/profile_popup.html', user=user)
+
 
 @ajax_bp.route('/collectors-count/<int:share_id>')
 def collectors_count(share_id):
     share = Share.query.get_or_404(share_id)
     count = len(share.collectors)
     return jsonify(count=count)
+
 
 @ajax_bp.route('/uncollec/<int:share_id>', methods=['POST'])
 def uncollect(share_id):
@@ -45,6 +49,7 @@ def uncollect(share_id):
 
     current_user.uncollect(share)
     return jsonify(message='Collect canceled.')
+
 
 @ajax_bp.route('/collect/<int:share_id>', methods=['POST'])
 def collect(share_id):
@@ -64,11 +69,13 @@ def collect(share_id):
         push_collect_notification(collector=current_user, share_id=share_id, receiver=share.author)
     return jsonify(message='Share collected.')
 
+
 @ajax_bp.route('/followers-count/<int:user_id>')
 def followers_count(user_id):
     user = User.query.get_or_404(user_id)
     count = user.followers.count() - 1
     return jsonify(count=count)
+
 
 @ajax_bp.route('/unfollow/<username>', methods=['POST'])
 def unfollow(username):
@@ -81,6 +88,7 @@ def unfollow(username):
 
     current_user.unfollow(user)
     return jsonify(message='Follow canceled.')
+
 
 @ajax_bp.route('/follow/<username>', methods=['POST'])
 def follow(username):
@@ -99,4 +107,3 @@ def follow(username):
     if user.receive_collect_notification:
         push_follow_notification(follower=current_user, receiver=user)
     return jsonify(message='User followed.')
-

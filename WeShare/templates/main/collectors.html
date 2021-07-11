@@ -5,26 +5,26 @@
 {% block title %}Collectors{% endblock %}
 
 {% block content %}
-    <div class="page-header">
-        <div class="row">
-            <div class="col-md-12">
-                <a class="btn btn-default btn-sm" href="{{ url_for('main.show_share', share_id=share.id) }}">
-                    <span class="oi oi-arrow-left" aria-hidden="true"></span> Return
-                </a>
-            </div>
-        </div>
-    </div>
+<div class="page-header">
     <div class="row">
         <div class="col-md-12">
-            <h3>{{ share.collectors|length }} Collectors</h3>
-            {% for collect in collects %}
-                {{ user_card(user=collect.collector) }}
-            {% endfor %}
+            <a class="btn btn-default btn-sm" href="{{ url_for('main.show_share', share_id=share.id) }}">
+                <span class="oi oi-arrow-left" aria-hidden="true"></span> Return
+            </a>
         </div>
     </div>
-    {% if collects %}
-        <div class="page-footer">
-            {{ render_pagination(pagination, align='center') }}
-        </div>
-    {% endif %}
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>{{ share.collectors|length }} Collectors</h3>
+        {% for collect in collects %}
+        {{ user_card(user=collect.collector) }}
+        {% endfor %}
+    </div>
+</div>
+{% if collects %}
+<div class="page-footer">
+    {{ render_pagination(pagination, align='center') }}
+</div>
+{% endif %}
 {% endblock %}

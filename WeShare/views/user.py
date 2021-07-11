@@ -11,14 +11,14 @@
 from flask import Blueprint, flash, request, redirect, current_app, render_template, url_for
 from flask_login import login_required, current_user, logout_user, fresh_login_required
 
+from WeShare.decorators import confirm_required, permission_required
 from WeShare.emails import send_change_email_email
 from WeShare.extensions import db, avatars
-from WeShare.models import User, Share, Collect
-from WeShare.decorators import confirm_required, permission_required
-from WeShare.notifications import push_follow_notification
-from WeShare.helpers import redirect_back, flash_errors, generate_token, validate_token
 from WeShare.forms.user import EditProfileForm, UploadAvatarForm, CropAvatarForm, \
     ChangeEmailForm, ChangePasswordForm, NotificationSettingForm, PrivacySettingForm, DeleteAccountForm
+from WeShare.helpers import redirect_back, flash_errors, generate_token, validate_token
+from WeShare.models import User, Share, Collect
+from WeShare.notifications import push_follow_notification
 from WeShare.settings import Operations
 
 user_bp = Blueprint('user', __name__)
@@ -48,6 +48,7 @@ def show_collections(username):
     collects = pagination.items
     return render_template('user/collections.html', user=user, pagination=pagination, collects=collects)
 
+
 @user_bp.route('/follow/<username>', methods=['POST'])
 @login_required
 @confirm_required
@@ -64,6 +65,7 @@ def follow(username):
         push_follow_notification(current_user, user)
     return redirect_back()
 
+
 @user_bp.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
@@ -76,6 +78,7 @@ def unfollow(username):
     flash('User unfollowed.', 'success')
     return redirect_back()
 
+
 @user_bp.route('/<username>/followers')
 def show_followers(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -84,6 +87,7 @@ def show_followers(username):
     pagination = user.followers.paginate(page, per_page)
     follows = pagination.items
     return render_template('user/followers.html', user=user, pagination=pagination, follows=follows)
+
 
 @user_bp.route('/<username>/following')
 def show_following(username):
@@ -116,6 +120,7 @@ def edit_profile():
     form.location.data = current_user.location
     return render_template('user/settings/edit_profile.html', form=form)
 
+
 @user_bp.route('/settings/avatar')
 @login_required
 @confirm_required
@@ -124,7 +129,8 @@ def change_avatar():
     crop_form = CropAvatarForm()
     return render_template('user/settings/change_avatar.html', upload_form=upload_form, crop_form=crop_form)
 
-@user_bp.route('/settings/avatar/upload',  methods=['POST'])
+
+@user_bp.route('/settings/avatar/upload', methods=['POST'])
 @login_required
 @confirm_required
 def upload_avatar():
@@ -137,6 +143,7 @@ def upload_avatar():
         flash('Image uploaded, please crop.', 'success')
     flash_errors(form)
     return redirect(url_for('.change_avatar'))
+
 
 @user_bp.route('/settings/avatar/crop', methods=['POST'])
 @login_required
@@ -157,6 +164,7 @@ def crop_avatar():
     flash_errors(form)
     return redirect(url_for('.change_avatar'))
 
+
 @user_bp.route('/settings/change-password', methods=['GET', 'POST'])
 @fresh_login_required
 def change_password():
@@ -171,6 +179,7 @@ def change_password():
             flash('Old password is wrong.', 'warning')
     return render_template('user/settings/change_password.html', form=form)
 
+
 @user_bp.route('/settings/change-email', methods=['GET', 'POST'])
 @fresh_login_required
 def change_email_request():
@@ -182,6 +191,7 @@ def change_email_request():
         return redirect(url_for('.index', username=current_user.username))
     return render_template('user/settings/change_email.html', form=form)
 
+
 @user_bp.route('/change-email/<token>')
 @login_required
 def change_email(token):
@@ -191,6 +201,7 @@ def change_email(token):
     else:
         flash('Invalid or expired token.', 'warning')
         return redirect(url_for('.change_email_request'))
+
 
 @user_bp.route('/settings/notification', methods=['GET', 'POST'])
 @login_required
@@ -208,6 +219,7 @@ def notification_setting():
     form.receive_follow_notification.data = current_user.receive_follow_notification
     return render_template('user/settings/edit_notification.html', form=form)
 
+
 @user_bp.route('/settings/privacy', methods=['GET', 'POST'])
 @login_required
 def privacy_setting():
@@ -219,6 +231,7 @@ def privacy_setting():
         return redirect(url_for('.index', username=current_user.username))
     form.public_collections.data = current_user.public_collections
     return render_template('user/settings/edit_privacy.html', form=form)
+
 
 @user_bp.route('/settings/account/delete', methods=['GET', 'POST'])
 @fresh_login_required

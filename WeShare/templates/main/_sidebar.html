@@ -24,9 +24,9 @@
     <div class="card-header">Hot Tags</div>
     <div class="list-group">
         {% for tag in tags %}
-            <a class="list-group-item" href="{{ url_for('.show_tag', tag_id=tag.id) }}">{{ tag.name }}
-                <span class="badge badge-pill">{{ tag.shares|length }}</span>
-            </a>
+        <a class="list-group-item" href="{{ url_for('.show_tag', tag_id=tag.id) }}">{{ tag.name }}
+            <span class="badge badge-pill">{{ tag.shares|length }}</span>
+        </a>
         {% endfor %}
     </div>
 </div>

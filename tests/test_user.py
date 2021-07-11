@@ -12,9 +12,9 @@ import io
 
 from flask import url_for
 
+from WeShare.helpers import generate_token
 from WeShare.models import User, Share
 from WeShare.settings import Operations
-from WeShare.helpers import generate_token
 from tests.base import BaseTestCase
 
 

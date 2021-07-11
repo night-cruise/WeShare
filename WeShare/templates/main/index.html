@@ -6,35 +6,35 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
-    <div class="row justify-content-md-center">
-        <div class="col-md-9">
-            {% if shares %}
-                {% for share in shares %}
-                    {{ share_card(share) }}
-                {% endfor %}
-            {% else %}
-                <div class="tip text-center">
-                    <h3>No trends.</h3>
-                    <p><a href="{{ url_for('.explore') }}">Explore</a></p>
-                </div>
-            {% endif %}
+<div class="row justify-content-md-center">
+    <div class="col-md-9">
+        {% if shares %}
+        {% for share in shares %}
+        {{ share_card(share) }}
+        {% endfor %}
+        {% else %}
+        <div class="tip text-center">
+            <h3>No trends.</h3>
+            <p><a href="{{ url_for('.explore') }}">Explore</a></p>
         </div>
-        <div class="col-md-3">
-            {% include 'main/_sidebar.html' %}
-        </div>
+        {% endif %}
     </div>
-    {% if shares %}
-        {{ render_pagination(pagination) }}
-    {% endif %}
+    <div class="col-md-3">
+        {% include 'main/_sidebar.html' %}
+    </div>
+</div>
+{% if shares %}
+{{ render_pagination(pagination) }}
+{% endif %}
 {% else %}
-    <div class="row">
-        <div class="col-md-9 align-self-center">
-            <h1>Weshare</h1>
-            <br>
-            <p>Share any thoughts you have.</p>
-            <br>
-            <p><a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Join Now</a></p>
-        </div>
+<div class="row">
+    <div class="col-md-9 align-self-center">
+        <h1>Weshare</h1>
+        <br>
+        <p>Share any thoughts you have.</p>
+        <br>
+        <p><a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Join Now</a></p>
     </div>
+</div>
 {% endif %}
 {% endblock %}

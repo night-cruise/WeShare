@@ -17,9 +17,9 @@ from flask import request, redirect, url_for, current_app, flash
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-from WeShare.settings import Operations
-from WeShare.models import User
 from WeShare.extensions import db
+from WeShare.models import User
+from WeShare.settings import Operations
 
 
 def is_safe_url(target):
@@ -48,6 +48,7 @@ def generate_token(user, operation, expire_in=None, **kwargs):
     data.update(**kwargs)
     return s.dumps(data)
 
+
 def validate_token(user, token, operation, new_password=None):
     s = Serializer(current_app.config['SECRET_KEY'])
     try:
@@ -73,6 +74,7 @@ def validate_token(user, token, operation, new_password=None):
         return False
     db.session.commit()
     return True
+
 
 def flash_errors(form):
     for field, errors in form.errors.items():

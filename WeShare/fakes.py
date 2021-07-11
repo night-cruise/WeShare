@@ -9,19 +9,21 @@
 """
 # here put the import lib
 import random
-from sqlalchemy.exc import IntegrityError
+
 from faker import Faker
+from sqlalchemy.exc import IntegrityError
 
 from WeShare.extensions import db
 from WeShare.models import User, Share, Tag, Comment, Notification
 
 fake = Faker()
 
+
 def fake_admin():
     admin = User(
-        name = 'Admin User',
+        name='Admin User',
         username='adminuser',
-        email = 'admin@weshare.com',
+        email='admin@weshare.com',
         bio=fake.sentence(),
         website='http://example.com',
         confirmed=True
@@ -32,6 +34,7 @@ def fake_admin():
     db.session.add(notification)
     db.session.commit()
 
+
 def fake_user(count=20):
     for i in range(count):
         user = User(
@@ -41,8 +44,8 @@ def fake_user(count=20):
             bio=fake.sentence(),
             website=fake.url(),
             member_since=fake.date_time_this_year(),
-            email = fake.email(),
-            location = fake.city(),
+            email=fake.email(),
+            location=fake.city(),
         )
         user.set_password('123456')
         db.session.add(user)
@@ -51,11 +54,13 @@ def fake_user(count=20):
         except IntegrityError:
             db.session.rollback()
 
+
 def fake_follow(count=60):
     for i in range(count):
         user = User.query.get(random.randint(1, User.query.count()))
         user.follow(User.query.get(random.randint(1, user.query.count())))
     db.session.commit()
+
 
 def fake_tag(count=20):
     for i in range(count):
@@ -65,6 +70,7 @@ def fake_tag(count=20):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
+
 
 def fake_share(count=60):
     for i in range(count):
@@ -79,19 +85,21 @@ def fake_share(count=60):
         db.session.add(share)
     db.session.commit()
 
+
 def fake_collect(count=60):
     for i in range(count):
         user = User.query.get(random.randint(1, User.query.count()))
         user.collect(Share.query.get(random.randint(1, Share.query.count())))
     db.session.commit()
 
+
 def fake_comment(count=150):
     for i in range(count):
         comment = Comment(
-            author = User.query.get(random.randint(1, User.query.count())),
+            author=User.query.get(random.randint(1, User.query.count())),
             body=fake.sentence(),
-            timestamp = fake.date_time_this_year(),
-            share = Share.query.get(random.randint(1, Share.query.count()))
+            timestamp=fake.date_time_this_year(),
+            share=Share.query.get(random.randint(1, Share.query.count()))
         )
         db.session.add(comment)
     db.session.commit()

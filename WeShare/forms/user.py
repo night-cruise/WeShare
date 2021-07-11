@@ -7,15 +7,16 @@
 @Version:   3.7.3
 @Desc:      None
 """
+from flask_login import current_user
 # here put the import lib
 from flask_wtf import FlaskForm
-from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.fields import StringField, TextAreaField, SubmitField, HiddenField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, Email, EqualTo
 from wtforms.validators import ValidationError
 
 from WeShare.models import User
+
 
 class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
@@ -32,6 +33,7 @@ class EditProfileForm(FlaskForm):
         if field.data != current_user.username and User.query.filter_by(username=field.data).first():
             raise ValidationError('The username is already in use.')
 
+
 class UploadAvatarForm(FlaskForm):
     image = FileField('Upload', validators=[
         FileRequired(),
@@ -39,12 +41,14 @@ class UploadAvatarForm(FlaskForm):
     ])
     submit = SubmitField()
 
+
 class CropAvatarForm(FlaskForm):
     x = HiddenField()
     y = HiddenField()
     w = HiddenField()
     h = HiddenField()
     submit = SubmitField('Crop and Update')
+
 
 class ChangeEmailForm(FlaskForm):
     email = StringField('New Email', validators=[DataRequired(), Length(1, 254), Email()])
@@ -54,6 +58,7 @@ class ChangeEmailForm(FlaskForm):
         if User.query.filter_by(email=field.data.lower()).first():
             raise ValidationError('The email is already in use.')
 
+
 class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old Password', validators=[DataRequired()])
     password = PasswordField('New Password', validators=[
@@ -61,15 +66,18 @@ class ChangePasswordForm(FlaskForm):
     password2 = PasswordField('Confirm Password', validators=[DataRequired()])
     submit = SubmitField()
 
+
 class NotificationSettingForm(FlaskForm):
     receive_comment_notification = BooleanField('New comment')
     receive_follow_notification = BooleanField('New follower')
     receive_collect_notification = BooleanField('New collector')
     submit = SubmitField()
 
+
 class PrivacySettingForm(FlaskForm):
     public_collections = BooleanField('Public my collection')
     submit = SubmitField()
+
 
 class DeleteAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(1, 20)])

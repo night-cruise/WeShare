@@ -15,11 +15,12 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp
 
 from WeShare.models import User
 
+
 class RegisterForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
     email = StringField('Email', validators=[DataRequired(), Length(1, 254)])
     username = StringField('Username', validators=[
-        DataRequired(), Length(1,20),
+        DataRequired(), Length(1, 20),
         Regexp(r'^[a-zA-Z0-9]*$',
                message='The username should contain only a-z, A-Z and 0-9.')
     ])
@@ -37,15 +38,18 @@ class RegisterForm(FlaskForm):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username is already in use.')
 
+
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 254)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Log in')
 
+
 class ForgetPasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 254)])
     submit = SubmitField()
+
 
 class ResetPasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 254), Email()])

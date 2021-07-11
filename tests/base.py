@@ -13,9 +13,10 @@ from typing import Optional
 
 from flask import url_for
 
-from WeShare.models import Role, User, Share, Tag, Comment
 from WeShare import create_app
 from WeShare.extensions import db
+from WeShare.models import Role, User, Share, Tag, Comment
+
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self) -> None:
@@ -54,13 +55,13 @@ class BaseTestCase(unittest.TestCase):
         db.session.add_all([admin_user, normal_user, unconfirmed_user, locked_user, blocked_user])
         db.session.commit()
 
-    def login(self, email: Optional[str]=None, password: Optional[str]=None):
+    def login(self, email: Optional[str] = None, password: Optional[str] = None):
         if email is None and password is None:
             email = 'normal@weshare.com'
             password = '123'
         return self.client.post(url_for('auth.login'), data=dict(
-            email = email,
-            password = password,
+            email=email,
+            password=password,
         ), follow_redirects=True)
 
     def logout(self):

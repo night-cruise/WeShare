@@ -12,12 +12,12 @@ from flask import Blueprint, redirect, url_for, flash, render_template
 from flask_login import current_user, login_required, login_user, \
     logout_user, login_fresh, confirm_login
 
+from WeShare.emails import send_confirm_email, send_reset_password_email
 from WeShare.extensions import db
-from WeShare.models import User
 from WeShare.forms.auth import RegisterForm, LoginForm, ResetPasswordForm, ForgetPasswordForm
 from WeShare.helpers import generate_token, validate_token, redirect_back
+from WeShare.models import User
 from WeShare.settings import Operations
-from WeShare.emails import send_confirm_email, send_reset_password_email
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -47,6 +47,7 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
 
+
 @auth_bp.route('/confirm/<token>')
 @login_required
 def confirm(token):
@@ -60,6 +61,7 @@ def confirm(token):
         flash('Invalid or expired token.', 'danger')
         return redirect(url_for('auth.resend_confirm_email'))
 
+
 @auth_bp.route('/resend-confirm-email')
 @login_required
 def resend_confirm_email():
@@ -68,6 +70,7 @@ def resend_confirm_email():
     token = generate_token(user=current_user, operation=Operations.CONFIRM)
     send_confirm_email(user=current_user, token=token)
     return redirect(url_for('main.index'))
+
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -81,11 +84,12 @@ def login():
             if login_user(user, remember=form.remember_me.data):
                 flash('Login success.', 'info')
                 return redirect_back()
-            else:   # Blocked user can't login.
+            else:  # Blocked user can't login.
                 flash('Your account is blocked.', 'warning')
                 return redirect(url_for('main.index'))
         flash('Invalid email or password.', 'warning')
     return render_template('auth/login.html', form=form)
+
 
 @auth_bp.route('/re-authenticate', methods=['GET', 'POST'])
 @login_required
@@ -98,12 +102,14 @@ def re_authenticate():
         return redirect_back()
     return render_template('auth/login.html', form=form)
 
+
 @auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('Logout success.', 'info')
     return redirect(url_for('main.index'))
+
 
 @auth_bp.route('/forget-password', methods=['GET', 'POST'])
 def forget_password():

@@ -12,6 +12,7 @@ from WeShare.extensions import db
 from WeShare.models import Comment, Role, User, Share, Tag
 from tests.base import BaseTestCase
 
+
 class CliTestCase(BaseTestCase):
     def setUp(self) -> None:
         super(CliTestCase, self).setUp()

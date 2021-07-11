@@ -10,9 +10,10 @@
 # here put the import lib
 from flask import url_for
 
+from WeShare.extensions import db
 from WeShare.models import User, Notification, Share, Comment, Tag
 from .base import BaseTestCase
-from WeShare.extensions import db
+
 
 class MainTestCase(BaseTestCase):
 
@@ -109,9 +110,9 @@ class MainTestCase(BaseTestCase):
     def test_new_share(self):
         self.login()
         response = self.client.post(url_for('main.new_share'), data=dict(
-            title = 'test title',
-            tag = 'tag1 tag2 tag2',
-            body = 'test body'
+            title='test title',
+            tag='tag1 tag2 tag2',
+            body='test body'
         ), follow_redirects=True)
         data = response.get_data(as_text=True)
         self.assertIn('Share success.', data)
@@ -195,7 +196,6 @@ class MainTestCase(BaseTestCase):
         response = self.client.get(url_for('main.share_previous', share_id=5), follow_redirects=True)
         data = response.get_data(as_text=True)
         self.assertIn('This is already the first one.', data)
-
 
     def test_collect(self):
         share = Share(title='test title 3', body='test body 3', author=User.query.get(2))

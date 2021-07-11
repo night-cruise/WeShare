@@ -5,28 +5,28 @@
 {% block title %}{{ user.name }}{% endblock %}
 
 {% block content %}
-    {% include 'user/_header.html' %}
-    <div class="row">
-        <div class="col-md-12">
-            {% if shares %}
-                {% for share in shares %}
-                    {{ share_card(share) }}
-                {% endfor %}
+{% include 'user/_header.html' %}
+<div class="row">
+    <div class="col-md-12">
+        {% if shares %}
+        {% for share in shares %}
+        {{ share_card(share) }}
+        {% endfor %}
+        {% else %}
+        <div class="tip text-center">
+            <h3>No shares.</h3>
+            {% if user == current_user %}
+            <a class="btn btn-link" href="{{ url_for('main.new_share') }}">Share</a>
             {% else %}
-                <div class="tip text-center">
-                    <h3>No shares.</h3>
-                    {% if user == current_user %}
-                        <a class="btn btn-link" href="{{ url_for('main.new_share') }}">Share</a>
-                    {% else %}
-                        <a class="btn btn-link" href="{{ url_for('main.explore') }}">Explore</a>
-                    {% endif %}
-                </div>
+            <a class="btn btn-link" href="{{ url_for('main.explore') }}">Explore</a>
             {% endif %}
         </div>
+        {% endif %}
     </div>
-    {% if shares %}
-        <div class="page-footer">
-            {{ render_pagination(pagination, align='center') }}
-        </div>
-    {% endif %}
+</div>
+{% if shares %}
+<div class="page-footer">
+    {{ render_pagination(pagination, align='center') }}
+</div>
+{% endif %}
 {% endblock %}

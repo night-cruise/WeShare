@@ -8,14 +8,14 @@
 @Desc:      None
 """
 # here put the import lib
-from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app
+from flask import Blueprint, render_template, flash, request, current_app
 from flask_login import login_required
 
 from WeShare.decorators import permission_required, admin_required
+from WeShare.extensions import db, cache
 from WeShare.forms.admin import EditProfileAdminForm
 from WeShare.helpers import redirect_back
 from WeShare.models import User, Share, Tag, Comment, Role
-from WeShare.extensions import db, cache
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -23,16 +23,16 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route('/index')
 @login_required
 @permission_required('MODERATE')
-@cache.cached(timeout=60*60, query_string=True)
+@cache.cached(timeout=60 * 60, query_string=True)
 def index():
     user_count = User.query.count()
     locked_user_count = User.query.filter_by(locked=True).count()
     blocked_user_count = User.query.filter_by(active=False).count()
     share_count = Share.query.count()
-    reported_shares_count = Share.query.filter(Share.flag>0).count()
+    reported_shares_count = Share.query.filter(Share.flag > 0).count()
     tag_count = Tag.query.count()
     comment_count = Comment.query.count()
-    reported_comment_count = Comment.query.filter(Comment.flag>0).count()
+    reported_comment_count = Comment.query.filter(Comment.flag > 0).count()
     return render_template(
         'admin/index.html',
         user_count=user_count, locked_user_count=locked_user_count,
@@ -41,6 +41,7 @@ def index():
         tag_count=tag_count, comment_count=comment_count,
         reported_comment_count=reported_comment_count
     )
+
 
 @admin_bp.route('/profile/<int:user_id>', methods=['GET', 'POST'])
 @login_required
@@ -114,6 +115,7 @@ def block_user(user_id):
         flash('Account blocked.', 'info')
     return redirect_back()
 
+
 @admin_bp.route('/unblock/user/<int:user_id>', methods=['POST'])
 @login_required
 @permission_required('MODERATE')
@@ -122,6 +124,7 @@ def unblock_user(user_id):
     user.unblock()
     flash('Block canceled.', 'info')
     return redirect_back()
+
 
 @admin_bp.route('/lock/user/<int:user_id>', methods=['POST'])
 @login_required
@@ -134,6 +137,7 @@ def lock_user(user_id):
         user.lock()
         flash('Account locked.', 'info')
     return redirect_back()
+
 
 @admin_bp.route('/unlock/user/<int:user_id>', methods=['POST'])
 @login_required
@@ -172,6 +176,7 @@ def manage_tag():
     tags = pagination.items
     return render_template('admin/manage_tag.html', pagination=pagination, tags=tags)
 
+
 @admin_bp.route('/delete/tag/<int:tag_id>', methods=['post'])
 @login_required
 @permission_required('MODERATE')
@@ -198,8 +203,3 @@ def manage_comment(order):
         pagination = Comment.query.order_by(Comment.flag.desc()).paginate(page, per_page)
     comments = pagination.items
     return render_template('admin/manage_comment.html', pagination=pagination, comments=comments, order_rule=order_rule)
-
-
-
-
-

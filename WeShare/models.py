@@ -10,11 +10,13 @@
 # here put the import lib
 import os
 from datetime import datetime
+
 from flask import current_app
+from flask_avatars import Identicon
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from WeShare.extensions import db, whooshee
-from flask_avatars import Identicon
 
 # relationship table
 roles_permissions = db.Table('roles_permissions',
@@ -70,6 +72,7 @@ class Follow(db.Model):
     follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
     followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
 
+
 # relationship object
 class Collect(db.Model):
     collector_id = db.Column(db.Integer, db.ForeignKey('user.id'),
@@ -80,6 +83,7 @@ class Collect(db.Model):
 
     collector = db.relationship('User', back_populates='collections', lazy='joined')
     collected = db.relationship('Share', back_populates='collectors', lazy='joined')
+
 
 @whooshee.register_model('name', 'username')
 class User(db.Model, UserMixin):
@@ -121,7 +125,7 @@ class User(db.Model, UserMixin):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.generate_avatar()
-        self.follow(self)   # follow self
+        self.follow(self)  # follow self
         self.set_role()
 
     def set_password(self, password):
@@ -159,7 +163,7 @@ class User(db.Model, UserMixin):
             db.session.commit()
 
     def is_following(self, user):
-        if user.id is None: # when follow self, user.id will be None
+        if user.id is None:  # when follow self, user.id will be None
             return False
         return self.following.filter_by(followed_id=user.id).first() is not None
 
@@ -169,7 +173,7 @@ class User(db.Model, UserMixin):
     @property
     def followed_shares(self):
         """current user following user's shares."""
-        return Share.query.join(Follow, Follow.followed_id==Share.author_id).filter(Follow.follower_id==self.id)
+        return Share.query.join(Follow, Follow.followed_id == Share.author_id).filter(Follow.follower_id == self.id)
 
     def collect(self, share):
         if not self.is_collecting(share):
@@ -215,15 +219,16 @@ class User(db.Model, UserMixin):
     def can(self, permission_name):
         permission = Permission.query.filter_by(name=permission_name).first()
         return permission is not None and \
-            self.role is not None and \
-            permission in self.role.permissions
+               self.role is not None and \
+               permission in self.role.permissions
 
 
-#relationship object
+# relationship object
 tagging = db.Table('tagging',
                    db.Column('share_id', db.Integer, db.ForeignKey('share.id')),
                    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
                    )
+
 
 @whooshee.register_model('title', 'body')
 class Share(db.Model):
@@ -240,12 +245,14 @@ class Share(db.Model):
     collectors = db.relationship('Collect', back_populates='collected', cascade='all')
     tags = db.relationship('Tag', secondary=tagging, back_populates='shares')
 
+
 @whooshee.register_model('name')
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
 
     shares = db.relationship('Share', secondary=tagging, back_populates='tags')
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -261,6 +268,7 @@ class Comment(db.Model):
     author = db.relationship('User', back_populates='comments')
     replies = db.relationship('Comment', back_populates='replied', cascade='all')
     replied = db.relationship('Comment', back_populates='replies', remote_side=[id])
+
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)

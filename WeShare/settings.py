@@ -17,10 +17,12 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 WIN = sys.platform.startswith('win')
 prefix = 'sqlite:///' if WIN else 'sqlite:////'
 
+
 class Operations:
     CONFIRM = 'confirm'
     RESET_PASSWORD = 'reset-password'
     CHANGE_EMAIL = 'change-email'
+
 
 class BaseConfig(object):
     WESHARE_ADMIN_EMAIL = os.getenv('WESHAER_EMAIL', 'admin@weshare.com')
@@ -66,19 +68,23 @@ class BaseConfig(object):
 
     WHOOSHEE_MIN_STRING_LEN = 1
 
+
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = prefix + os.path.join(BASE_DIR, 'data-dev.db')
+
 
 class TestingConfig(BaseConfig):
     TESTING = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///'  # in-memory database
 
+
 class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URI',
         prefix + os.path.join(BASE_DIR, 'data.db')
     )
+
 
 config = {
     'development': DevelopmentConfig,
